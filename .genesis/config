@@ -1,0 +1,3 @@
+---
+genesis: 2.2.0
+deployment_type: bosh-genesis-kit
