@@ -1,7 +1,7 @@
 ---
 kit:
-  name:    dev
-  version: latest
+  name: bosh
+  version: 0.1.6
   subkits:
   - vsphere-cpi
   - bosh

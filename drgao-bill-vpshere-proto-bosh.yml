@@ -1,12 +1,12 @@
 ---
 kit:
-  name:    dev
-  version: latest
+  name: bosh
+  version: 0.1.6
   subkits:
   - vsphere-cpi
   - vsphere-init
   - bosh-init
-    #- shield
+  - shield
 
 params:
   env:   drgao-bill-vpshere-proto-bosh
