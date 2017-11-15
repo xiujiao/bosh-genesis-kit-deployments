@@ -1,0 +1,166 @@
+azs:
+- name: z1
+  cloud_properties:
+    datacenters:
+    - name: Interxion MAD2
+      clusters:
+      - {cluster1: {}}
+- name: z2
+  cloud_properties:
+    datacenters:
+    - name: Interxion MAD2
+      clusters:
+      - {cluster1: {}}
+- name: z3
+  cloud_properties:
+    datacenters:
+    - name: Interxion MAD2
+      clusters:
+      - {cluster1: {}}
+
+vm_extensions:
+- name: cf-elb
+- name: internal-elb
+- name: ssh-elb
+- name: tcp-elb
+- name: 50GB_ephemeral_disk
+- name: 100GB_ephemeral_disk
+
+vm_types:
+- name: tiny
+  cloud_properties:
+    ram: 512
+    cpu: 1
+    disk: 2048
+- name: small
+  cloud_properties:
+    ram: 2048
+    cpu: 1
+    disk: 10_240
+- name: errand
+  cloud_properties:
+    ram: 2048
+    cpu: 1
+    disk: 51_200
+- name: medium
+  cloud_properties:
+    ram: 4096
+    cpu: 2
+    disk: 32_768
+- name: large
+  cloud_properties:
+    ram: 8192
+    cpu: 4
+    disk: 65_536
+- name: runtime
+  cloud_properties:
+    ram: 16384
+    cpu: 2
+    disk: 102_400 
+- name: compilation-vm
+  cloud_properties:
+    ram: 8192
+    cpu: 2
+    disk: 20_480
+
+disk_types:
+- name: small
+  disk_size: 1024
+  cloud_properties:
+    type: preallocated
+- name: consul
+  disk_size: 10_240
+  cloud_properties:
+    type: preallocated
+- name: postgres
+  disk_size: 20_480
+  cloud_properties:
+    type: preallocated
+- name: blobstore
+  disk_size: 102_400
+  cloud_properties:
+    type: preallocated
+
+networks:
+- name: cf-edge
+  type: manual
+  subnets:
+    - range: 10.213.0.0/20
+      gateway: 10.213.0.1
+      azs: [z1,z2,z3]
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+      reserved:
+        - 10.213.0.1 - 10.213.13.30
+        - 10.213.13.51 - 10.213.15.254
+      static: [ 10.213.13.31 - 10.213.13.50]
+      cloud_properties:
+        name: net-10-213-0-0
+- name: cf-core
+  type: manual
+  subnets:
+    - range: 10.213.0.0/20
+      gateway: 10.213.0.1
+      azs:  [z1,z2,z3]
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+      reserved:
+        - 10.213.0.1 - 10.213.13.50
+        - 10.213.13.80 - 10.213.15.254
+      static: [ 10.213.13.51 - 10.213.13.60] 
+      cloud_properties:
+        name: net-10-213-0-0
+- name: cf-runtime
+  type: manual
+  subnets:
+    - range: 10.213.0.0/20
+      gateway: 10.213.0.1
+      azs:  [z1,z2,z3]
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+      reserved:
+        - 10.213.0.1 - 10.213.13.81
+        - 10.213.13.110 - 10.213.15.254
+      static: []
+      cloud_properties:
+        name: net-10-213-0-0
+- name: cf-db
+  type: manual
+  subnets:
+    - range: 10.213.0.0/20
+      gateway: 10.213.0.1
+      azs: [z1,z2,z3]
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+      reserved:
+        - 10.213.0.1 - 10.213.13.109
+        - 10.213.13.130 - 10.213.15.254
+      static: [ 10.213.13.110 - 10.213.13.120 ]
+      cloud_properties:
+        name: net-10-213-0-0
+        #- name: cf-svc
+        #  type: manual
+        #  subnets:
+        #    - range: 10.213.0.0/20
+        #      gateway: 10.213.0.1
+        #      az: z1
+        #      dns:
+        #        - 168.63.129.16
+        #      reserved:
+        #        - 10.0.26.2 - 10.0.26.3 # Azure reserved
+        #      static:
+        #        - 10.0.26.4 # HAProxy for cf-rabbitmq service broker
+        #      cloud_properties:
+        #        name: net-10-213-0-0
+        #
+compilation:
+  network: cf-runtime
+  reuse_compilation_vms: true
+  az: z1
+  workers: 6
+  vm_type: compilation-vm
+

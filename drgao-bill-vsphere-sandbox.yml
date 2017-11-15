@@ -1,0 +1,57 @@
+---
+kit:
+  name:    dev
+  version: latest
+  subkits:
+  - vsphere-cpi
+  - bosh
+    # - shield
+
+params:
+  env:   drgao-bill-vsphere-sandbox
+  vault: drgao/bill/vsphere/sandbox/bosh-genesis-kit
+  bosh: drgao-proto
+
+  # This defines the IP that BOSH will be deployed on.
+  # It should be a an IP from the static IP pool on the network
+  # you are deploying the VM onto. Usually the BOSH manifest
+  # will handle this via `networks`, but the IP is
+  # required to create the SSL certificate for BOSH, prior
+  # to deploying. If you change this, make sure to
+  # have genesis regenerate your SSL certificate.
+  static_ip: 10.213.13.6
+
+  # This is the FQDN for the above  `static_ip`. If you do not have a DNS entry for that IP, or you can simply enter 'bosh'
+  bosh_hostname: bosh
+
+  # Override the default cloud-config network name for BOSH
+  bosh_network: dev-infra
+
+  # Bosh needs the name of vSphere datacenter it is placed to
+  vsphere_datacenter: Interxion MAD2
+
+  # Bosh needs the name of at least one vSphere cluster to deploy to?
+  vsphere_clusters:
+  - cluster1
+
+  # Bosh uses ephemeral disk for the operating system and swap disk
+  vsphere_ephemeral_datastores:
+  - vol309
+  - vol310
+
+  # BOSH uses persistent disks to store data that needs to survive redeploy
+  vsphere_persistent_datastores:
+  - vol309
+  - vol310
+
+  # This value is required for non-Proto-BOSH BOSHes.
+  # It indicates the target alias of the BOSH that
+  # will be used to deploy this BOSH. If you do
+  # not have a BOSH to deploy this BOSH from,
+  # you will want to use the `bosh-init` kit to
+  # deploy this as a Proto-BOSH.
+  bosh: drgao-proto
+
+  # This is usually something like `secret/path/to/keys/for/shield/agent:public`
+  # If you are unsure, use `safe tree` to find it.
+  shield_key_vault_path: secret/drgao/bill/vsphere/shield/agent:public
