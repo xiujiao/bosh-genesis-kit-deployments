@@ -24,7 +24,11 @@ vm_extensions:
 - name: ssh-elb
 - name: tcp-elb
 - name: 50GB_ephemeral_disk
+  cloud_properties:
+    disk: 51_200
 - name: 100GB_ephemeral_disk
+  cloud_properties:
+    disk: 102_400
 
 vm_types:
 - name: tiny
@@ -78,6 +82,10 @@ disk_types:
     type: preallocated
 - name: blobstore
   disk_size: 102_400
+  cloud_properties:
+    type: preallocated
+- name: vault
+  disk_size: 4_096
   cloud_properties:
     type: preallocated
 
@@ -157,6 +165,23 @@ networks:
         #      cloud_properties:
         #        name: net-10-213-0-0
         #
+- name: vault
+  type: manual
+  subnets:
+  - range: 10.213.0.0/20
+    gateway: 10.213.0.1
+    azs: [z1,z2,z3]
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    reserved:
+    - 10.213.0.1 - 10.213.13.129 # reserved + protobosh (+sandbox bosh)
+    - 10.213.13.133 -10.213.15.254
+    static:
+    - 10.213.13.130 - 10.213.13.132
+    cloud_properties:
+      name: net-10-213-0-0
+
 compilation:
   network: cf-runtime
   reuse_compilation_vms: true
