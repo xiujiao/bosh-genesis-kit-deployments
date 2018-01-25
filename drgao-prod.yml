@@ -1,10 +1,11 @@
 ---
 kit:
-  name:    bosh
-  version: 0.1.6
+  name: bosh
+  version: 0.2.0
   subkits:
   - vsphere-cpi
   - bosh
+  - shield
 
 params:
   env:   drgao-prod
@@ -49,3 +50,8 @@ params:
   # you will want to use the `bosh-init` kit to
   # deploy this as a Proto-BOSH.
   bosh: drgao-proto
+
+  shield_ca_vault_path: secret/drgao/sandbox/shield/certs/ca:certificate
+  shield_core_url: https://10.213.13.133
+  shield_key_vault_path: secret/drgao/sandbox/shield/agent:public
+

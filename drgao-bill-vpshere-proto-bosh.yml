@@ -1,7 +1,7 @@
 ---
 kit:
   name: bosh
-  version: 0.1.6
+  version: 0.2.0
   subkits:
   - vsphere-cpi
   - vsphere-init
@@ -69,4 +69,7 @@ params:
 
   # This is usually something like `secret/path/to/keys/for/shield/agent:public`
   # If you are unsure, use `safe tree` to find it.
-  shield_key_vault_path: secret/drgao/bill/vsphere/shield/agent:public
+  shield_ca_vault_path: secret/drgao/sandbox/shield/certs/ca:certificate
+  shield_core_url: https://10.213.13.133
+  shield_key_vault_path: secret/drgao/sandbox/shield/agent:public
+

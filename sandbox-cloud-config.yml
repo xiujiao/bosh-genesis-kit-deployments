@@ -88,6 +88,10 @@ disk_types:
   disk_size: 4_096
   cloud_properties:
     type: preallocated
+- cloud_properties:
+    type: preallocated
+  disk_size: 10240
+  name: shield
 
 networks:
 - name: cf-edge
@@ -181,6 +185,27 @@ networks:
     - 10.213.13.130 - 10.213.13.132
     cloud_properties:
       name: net-10-213-0-0
+
+- name: shield
+  subnets:
+  - azs:
+    - z1
+    - z2
+    - z3
+    cloud_properties:
+      name: net-10-213-0-0
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
+    reserved:
+    - 10.213.0.1 - 10.213.13.132
+    - 10.213.13.137 -10.213.13.254
+    static:
+    - 10.213.13.133 - 10.213.13.136
+  type: manual
+
 
 compilation:
   network: cf-runtime

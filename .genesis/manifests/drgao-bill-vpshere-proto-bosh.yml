@@ -1,9 +1,12 @@
 cloud_provider:
-  certificate: REDACTED
+  cert:
+    ca: REDACTED
+    certificate: REDACTED
+    private_key: REDACTED
   mbus: https://mbus:REDACTED@10.213.13.5:6868
   properties:
     agent:
-      mbus: https://mbus:REDACTED@10.213.13.5:6868
+      mbus: https://mbus:REDACTED@0.0.0.0:6868
     blobstore:
       path: /var/vcap/micro_bosh/data/cache
       provider: local
@@ -46,8 +49,97 @@ instance_groups:
     release: bosh
   - name: health_monitor
     release: bosh
+  - name: uaa
+    properties:
+      login:
+        saml:
+          serviceProviderCertificate: REDACTED
+          serviceProviderKey: REDACTED
+          serviceProviderKeyPassword: ""
+      uaa:
+        clients:
+          admin:
+            authorities: bosh.admin
+            authorized-grant-types: client_credentials
+            override: true
+            scope: ""
+            secret: REDACTED
+          bosh_cli:
+            access-token-validity: 120
+            authorities: uaa.none
+            authorized-grant-types: password,refresh_token
+            override: true
+            refresh-token-validity: 86400
+            scope: openid,bosh.admin,bosh.read,bosh.*.admin,bosh.*.read
+            secret: ""
+          concourse:
+            access-token-validity: 120
+            authorities: bosh.admin
+            authorized-grant-types: client_credentials
+            override: true
+            refresh-token-validity: 500
+            scope: ""
+            secret: REDACTED
+          hm:
+            authorities: bosh.admin
+            authorized-grant-types: client_credentials
+            override: true
+            scope: ""
+            secret: REDACTED
+          uaa_admin:
+            authorities: clients.read,clients.write,clients.secret,uaa.admin,scim.read,scim.write,password.write
+            authorized-grant-types: client_credentials
+            override: true
+            scope: ""
+            secret: REDACTED
+        jwt:
+          signing_key: REDACTED
+          verification_key: REDACTED
+        login:
+          client_secret: REDACTED
+        port: -1
+        scim:
+          users:
+          - groups:
+            - bosh.admin
+            name: admin
+            password: REDACTED
+          - groups:
+            - bosh.admin
+            name: concourse
+            password: REDACTED
+        sslCertificate: REDACTED
+        sslPrivateKey: REDACTED
+        url: https://10.213.13.5:8443
+        zones:
+          internal:
+            hostnames: []
+      uaadb:
+        address: 127.0.0.1
+        databases:
+        - name: uaa
+          tag: uaa
+        db_scheme: postgresql
+        port: 5432
+        roles:
+        - name: boshdb
+          password: REDACTED
+          tag: admin
+    release: uaa
   - name: vsphere_cpi
     release: bosh-vsphere-cpi
+  - name: shield-agent
+    properties:
+      agent:
+        key: REDACTED
+      core:
+        ca: REDACTED
+      env:
+        http_proxy: ""
+        https_proxy: ""
+        no_proxy: ""
+      shield-url: https://10.213.13.133
+    release: shield
   name: bosh
   networks:
   - name: bosh
@@ -72,6 +164,8 @@ instance_groups:
       cpi_job: vsphere_cpi
       db:
         adapter: postgres
+        additional_databases:
+        - uaa
         database: bosh
         host: 127.0.0.1
         listen_address: 127.0.0.1
@@ -84,6 +178,8 @@ instance_groups:
         record_events: true
       flush_arp: true
       generate_vm_passwords: true
+      local_dns:
+        enabled: true
       name: drgao-bill-vpshere-proto-bosh-bosh-genesis-kit
       ssl:
         cert: REDACTED
@@ -95,23 +191,44 @@ instance_groups:
             password: REDACTED
           - name: admin
             password: REDACTED
-        provider: local
+        provider: uaa
+        uaa:
+          public_key: REDACTED
+          url: https://10.213.13.5:8443
       workers: 4
     hm:
       director_account:
         ca_cert: REDACTED
+        client_id: hm
+        client_secret: REDACTED
         password: REDACTED
         user: resurrector
       resurrector_enabled: true
     nats:
-      address: 127.0.0.1
+      address: 10.213.13.5
       password: REDACTED
+      tls:
+        ca: REDACTED
+        client_ca:
+          certificate: REDACTED
+          private_key: REDACTED
+        director:
+          certificate: REDACTED
+          private_key: REDACTED
+        health_monitor:
+          certificate: REDACTED
+          private_key: REDACTED
+        server:
+          certificate: REDACTED
+          private_key: REDACTED
       user: natsuser
     ntp:
     - 0.pool.ntp.org
     - 1.pool.ntp.org
     postgres:
       adapter: postgres
+      additional_databases:
+      - uaa
       database: bosh
       host: 127.0.0.1
       listen_address: 127.0.0.1
@@ -147,13 +264,21 @@ networks:
   type: manual
 releases:
 - name: bosh
-  sha1: 37630c636a030454d55703cfdd495d733525353f
-  url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-263.2.0-ubuntu-trusty-3445.7-20170915-052445-759948783-20170915052451.tgz?versionId=3kjVQuRK7JyrnbKEbKhLRi7qyo0wBXZJ
-  version: 263.2.0
+  sha1: 0ff5b856bbdb901691e98283823fd1f112768569
+  url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-264.5.0-ubuntu-trusty-3468.13-20171214-231004-994547171-20171214231009.tgz?versionId=66MJhlOuDZn3SM18oBXxVP6DuV2BOXZi
+  version: 264.5.0
+- name: uaa
+  sha1: 09a83ee0dff8a7791f99cd2261a92b38cc5001ff
+  url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/uaa-52.4-ubuntu-trusty-3468.13-20171209-003153-486864753-20171209003200.tgz?versionId=_NrqFWkxlSlVlaoZR5nSZRzKhEdu.qN3
+  version: "52.4"
 - name: bosh-vsphere-cpi
   sha1: b5f3c53c800d6c8a9182b263ec239a952f33ba67
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?v=45
   version: 45
+- name: shield
+  sha1: 4bfe8fbe7de8db8c19f35198e94578d7500bc64e
+  url: https://github.com/starkandwayne/shield-boshrelease/releases/download/v8.0.7/shield-8.0.7.tgz
+  version: 8.0.7
 resource_pools:
 - cloud_properties:
     cpu: 2
@@ -161,12 +286,17 @@ resource_pools:
     ram: 4096
   env:
     bosh:
+      mbus:
+        cert:
+          ca: REDACTED
+          certificate: REDACTED
+          private_key: REDACTED
       password: REDACTED
   name: small
   network: bosh
   stemcell:
-    sha1: d89d0f08d748a8a07d05dca915cd9ddfcdee52a6
-    url: https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3468.1
+    sha1: 7bdc471baa6c72c5d981d2b37a3765292da188e8
+    url: https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3468.20
 stemcells:
 - alias: default
   os: ubuntu-trusty
@@ -177,5 +307,5 @@ update:
   max_in_flight: 1
   serial: true
   update_watch_time: 30000-120000
-variables: null
+variables: []
 

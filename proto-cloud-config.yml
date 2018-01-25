@@ -1,144 +1,175 @@
 azs:
-- name: z1
-  cloud_properties:
+- cloud_properties:
     datacenters:
-    - name: Interxion MAD2
-      clusters:
-      - {cluster1: {}}
-- name: z2
-  cloud_properties:
+    - clusters:
+      - cluster1: {}
+      name: Interxion MAD2
+  name: z1
+- cloud_properties:
     datacenters:
-    - name: Interxion MAD2
-      clusters:
-      - {cluster1: {}}
-- name: z3
-  cloud_properties:
+    - clusters:
+      - cluster1: {}
+      name: Interxion MAD2
+  name: z2
+- cloud_properties:
     datacenters:
-    - name: Interxion MAD2
-      clusters:
-      - {cluster1: {}}
-
-vm_types:
-- name: small
-  cloud_properties:
-    cpu: 2
-    ram: 1024
-    disk: 3240
-- name: large
-  cloud_properties:
-    cpu: 2
-    ram: 4096
-    disk: 30_240
-
+    - clusters:
+      - cluster1: {}
+      name: Interxion MAD2
+  name: z3
+compilation:
+  az: z1
+  network: vault
+  reuse_compilation_vms: true
+  vm_type: large
+  workers: 6
 disk_types:
-- name: shield
+- cloud_properties:
+    type: preallocated
   disk_size: 10240
-  cloud_properties:
+  name: shield
+- cloud_properties:
     type: preallocated
-- name: bosh
-  disk_size: 61_440
-  cloud_properties:
+  disk_size: 61440
+  name: bosh
+- cloud_properties:
     type: preallocated
-- name: jumpbox
-  disk_size: 30_720
-  cloud_properties:
+  disk_size: 30720
+  name: jumpbox
+- cloud_properties:
     type: preallocated
-- name: concourse
-  disk_size: 51_200
-  cloud_properties:
+  disk_size: 51200
+  name: concourse
+- cloud_properties:
     type: preallocated
-- name: vault
-  disk_size: 4_096
-  cloud_properties:
-    type: preallocated
-
+  disk_size: 4096
+  name: vault
 networks:
 - name: vault
-  type: manual
   subnets:
-  - range: 10.213.0.0/20
-    gateway: 10.213.0.1
-    azs: [z1,z2,z3]
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    reserved:
-    - 10.213.0.1 - 10.213.13.6 # reserved + protobosh (+sandbox bosh)
-    - 10.213.13.10 -10.213.13.14
-    - 10.213.13.20 
-    static:
-    - 10.213.13.7 - 10.213.13.9
+  - azs:
+    - z1
+    - z2
+    - z3
     cloud_properties:
       name: net-10-213-0-0
-- name: concourse
-  type: manual
-  subnets:
-  - range: 10.213.0.0/20
-    gateway: 10.213.0.1
-    azs: [z1,z2,z3]
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    reserved:
-    - 10.213.0.1 - 10.213.13.6 # reserved + protobosh (+sandbox bosh)
-    - 10.213.13.7 -10.213.13.14
-    - 10.213.13.20 
-    static:
-    - 10.213.13.21 - 10.213.13.25
-    cloud_properties:
-      name: net-10-213-0-0
-- name: shield 
-  type: manual
-  subnets:
-  - range: 10.213.0.0/20
-    gateway: 10.213.0.1
-    azs: [z1,z2,z3]
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    reserved:
-    - 10.213.0.1 - 10.213.13.6 # reserved + protobosh (+sandbox bosh)
-    - 10.213.13.7 -10.213.13.25
-    static:
-    - 10.213.13.26 - 10.213.13.30
-    cloud_properties:
-      name: net-10-213-0-0
-- name: dev-infra
-  type: manual
-  subnets:
-  - range: 10.213.0.0/20
-    gateway: 10.213.0.1
-    azs: [z1]
     dns:
     - 8.8.8.8
     - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
+    reserved:
+    - 10.213.0.1 - 10.213.13.6
+    - 10.213.13.10 -10.213.13.14
+    - 10.213.13.20
+    static:
+    - 10.213.13.7 - 10.213.13.9
+  type: manual
+- name: concourse
+  subnets:
+  - azs:
+    - z1
+    - z2
+    - z3
+    cloud_properties:
+      name: net-10-213-0-0
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
+    reserved:
+    - 10.213.0.1 - 10.213.13.6
+    - 10.213.13.7 -10.213.13.14
+    - 10.213.13.20
+    static:
+    - 10.213.13.21 - 10.213.13.25
+  type: manual
+- name: shield
+  subnets:
+  - azs:
+    - z1
+    - z2
+    - z3
+    cloud_properties:
+      name: net-10-213-0-0
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
+    reserved:
+    - 10.213.0.1 - 10.213.13.6
+    - 10.213.13.7 -10.213.13.25
+    static:
+    - 10.213.13.26 - 10.213.13.30
+  type: manual
+- name: jumpbox
+  subnets:
+  - azs:
+    - z1
+    - z2
+    - z3
+    cloud_properties:
+      name: net-10-213-0-0
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
+    reserved:
+    - 10.213.0.1 - 10.213.13.10
+    - 10.213.13.13 -10.213.13.25
+    static:
+    - 10.213.13.11
+    - 10.213.13.12
+  type: manual
+- name: dev-infra
+  subnets:
+  - azs:
+    - z1
+    cloud_properties:
+      name: net-10-213-0-0
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
     reserved:
     - 10.213.0.1 - 10.213.13.5
     static:
     - 10.213.13.6
+  type: manual
+- name: prod-infra
+  subnets:
+  - azs:
+    - z1
     cloud_properties:
       name: net-10-213-0-0
-
-- name: prod-infra
-  type: manual
-  subnets:
-  - range: 10.213.0.0/20
-    gateway: 10.213.0.1
-    azs: [z1]
     dns:
     - 8.8.8.8
     - 8.8.4.4
+    gateway: 10.213.0.1
+    range: 10.213.0.0/20
     reserved:
     - 10.213.0.1 - 10.213.13.9
     - 10.213.13.11 - 10.213.15.254
     static:
     - 10.213.13.10
-    cloud_properties:
-      name: net-10-213-0-0
-
-compilation:
-  network: vault
-  reuse_compilation_vms: true
-  az: z1
-  workers: 6
-  vm_type: large
+  type: manual
+vm_types:
+- cloud_properties:
+    cpu: 2
+    disk: 3240
+    ram: 1024
+  name: small
+- cloud_properties:
+    cpu: 2
+    disk: 30240
+    ram: 4096
+  name: large
+- cloud_properties:
+    cpu: 1
+    disk: 10240
+    ram: 1024
+  name: jumpbox

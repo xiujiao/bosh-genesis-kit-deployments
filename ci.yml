@@ -1,0 +1,56 @@
+pipeline:
+  name: bosh-genesis-kit-deployments
+
+  public:      false
+  tagged:      false
+  debug:       false
+  skip_upkeep: false
+
+  git:
+    owner:       xiujiao
+    repo:        bosh-genesis-kit-deployments
+    private_key: (( vault "secret/concourse-ci/git-ssh/git@github.com/xiujiao/bosh-genesis-kit-deployments:private" ))
+
+  vault:
+    role:   (( vault "secret/concourse-ci/bosh-genesis-kit-deployments/vault:role_id" ))
+    secret: (( vault "secret/concourse-ci/bosh-genesis-kit-deployments/vault:secret_id" ))
+    url:    http://127.0.0.1:8200
+    verify: true
+
+  slack:
+    webhook: "https://hooks.slack.com/services/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"
+    channel: "botspam"
+
+  locker:
+    url:      https://10.213.13.24:8910
+    username: locker
+    password: (( vault "secret/drgao/proto/concourse/locker/api:password" ))
+
+  stemcells:
+    vsphere-esxi: bosh-vsphere-esxi-ubuntu-trusty-go_agent
+
+  boshes:
+    drgao-bill-vsphere-sandbox:
+      alias:     drgao-bill-vsphere-sandbox
+      url:       https://10.213.13.5:25555
+      ca_cert:   (( vault "secret/drgao/bill/vpshere/proto/bosh/bosh-genesis-kit/ssl/ca:certificate" ))
+      username:  concourse
+      password:  (( vault "secret/drgao/bill/vpshere/proto/bosh/bosh-genesis-kit/users/concourse:password" ))
+      stemcells: 
+      - vsphere-esxi
+
+    drgao-prod:
+      alias:     drgao-prod
+      url:       https://10.213.13.5:25555
+      ca_cert:   (( vault "secret/drgao/bill/vpshere/proto/bosh/bosh-genesis-kit/ssl/ca:certificate" ))
+      username:  concourse
+      password:  (( vault "secret/drgao/bill/vpshere/proto/bosh/bosh-genesis-kit/users/concourse:password" ))
+      stemcells: 
+      - vsphere-esxi
+
+  layouts:
+    default: |+
+      auto drgao-bill-vsphere-sandbox
+      drgao-bill-vsphere-sandbox -> drgao-prod
+
+  errands: []
